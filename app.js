@@ -258,7 +258,8 @@ function renderHome() {
   const debts  = getTotalDebts();
   const level  = getWealthLevel();
   const score  = getFinancialScore();
-  const goals  = getGoalsWithAllocation().slice(0, 3);
+  const allGoalsAlloc = getGoalsWithAllocation();
+  const goals  = allGoalsAlloc.slice(0, 3);
 
   // Mobile greeting
   setText('home-greeting-time', getGreeting() + ',');
@@ -302,6 +303,15 @@ function renderHome() {
     score >= 40 ? 'Building momentum. Set more goals!' :
                   'Add accounts and goals to improve your score.'
   );
+
+  // % of Life Funded
+  const totalAllocated = allGoalsAlloc.reduce((s, g) => s + g.displaySaved, 0);
+  const totalTarget    = allGoalsAlloc.reduce((s, g) => s + (g.target || 0), 0);
+  const lifeFundedPct  = totalTarget > 0 ? Math.round((totalAllocated / totalTarget) * 100) : 0;
+  setText('home-life-funded-pct', lifeFundedPct + '%');
+  const lfFill = document.getElementById('home-life-funded-fill');
+  if (lfFill) lfFill.style.width = Math.min(100, lifeFundedPct) + '%';
+  setText('home-life-funded-sub', `${fmt(totalAllocated, true)} of ${fmt(totalTarget, true)} funded`);
 
   // Top goals (uses allocation-aware display)
   const gc = document.getElementById('home-goals');
