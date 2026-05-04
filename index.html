@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#F2F0EC" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <title>Pape — Financial Tracker</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════════════════
+     ONBOARDING
+════════════════════════════════════════════════════════ -->
+<div id="onboarding">
+  <div class="ob-logo">🏛️</div>
+  <h1 class="ob-title">Pape</h1>
+  <p class="ob-sub">Your personal finance tracker.<br>Set goals, track wealth, level up.</p>
+  <div class="ob-form">
+    <div class="field">
+      <label class="field-label" for="ob-name">What's your name?</label>
+      <input id="ob-name" class="input" type="text" placeholder="e.g. Alex, Jamie…" autocomplete="given-name" />
+    </div>
+    <button class="btn btn-primary" onclick="completeOnboarding()">Get Started →</button>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════
+     APP SHELL — flex-row on desktop (sidebar + content-wrap)
+════════════════════════════════════════════════════════ -->
+<div id="app-shell" class="hidden">
+
+  <!-- ─── SIDEBAR (desktop ≥1024px only) ─────────────── -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="sidebar-logo-icon">🏛️</div>
+      <span class="sidebar-brand-name">Pape</span>
+    </div>
+
+    <nav class="sidebar-nav">
+      <button class="sidebar-tab active" data-screen="home">
+        <span class="s-icon">🏠</span><span class="s-label">Home</span>
+      </button>
+      <button class="sidebar-tab" data-screen="accounts">
+        <span class="s-icon">💳</span><span class="s-label">Accounts</span>
+      </button>
+      <button class="sidebar-tab" data-screen="goals">
+        <span class="s-icon">🎯</span><span class="s-label">Goals</span>
+      </button>
+      <button class="sidebar-tab" data-screen="settings">
+        <span class="s-icon">⚙️</span><span class="s-label">Settings</span>
+      </button>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="sf-label">Net Worth</div>
+      <div class="sf-nw" id="sidebar-nw">$0</div>
+      <button class="sf-avatar" id="sidebar-avatar" onclick="navigate('settings')" title="Settings">💎</button>
+    </div>
+  </aside>
+
+  <!-- ─── CONTENT WRAP (scrollable main area) ──────────── -->
+  <div class="content-wrap">
+
+    <!-- ══════════════════════════════════════════
+         SCREEN: HOME
+    ══════════════════════════════════════════ -->
+    <div id="screen-home" class="screen active">
+
+      <!-- Mobile header -->
+      <div class="mobile-header header">
+        <div class="header-left">
+          <div class="header-time" id="home-greeting-time">Good morning,</div>
+          <div class="header-name" id="home-greeting-name">Friend</div>
+        </div>
+        <button class="avatar-btn" id="home-avatar" onclick="navigate('settings')" aria-label="Settings">💎</button>
+      </div>
+
+      <!-- Desktop page header -->
+      <div class="desktop-page-top">
+        <div>
+          <div class="desktop-greeting" id="desktop-greeting">Good morning, Friend</div>
+          <div class="desktop-subline">Here's your financial overview</div>
+        </div>
+      </div>
+
+      <!-- ── Home dashboard grid ── -->
+      <div class="home-grid">
+
+        <!-- Left col: net worth + level + score -->
+        <div class="home-col-left">
+
+          <div class="nw-card">
+            <div class="nw-label">Net Worth</div>
+            <div class="nw-amount" id="home-nw">$0</div>
+            <div class="nw-split">
+              <div class="nw-chip">
+                <div class="nw-chip-label">Assets</div>
+                <div class="nw-chip-val" id="home-assets">$0</div>
+              </div>
+              <div class="nw-chip">
+                <div class="nw-chip-label">Debt</div>
+                <div class="nw-chip-val" id="home-debts">$0</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="level-card">
+            <div class="level-badge" id="home-level-badge">🌱</div>
+            <div class="level-body">
+              <div class="level-num" id="home-level-num">Level 0</div>
+              <div class="level-title" id="home-level-title">Starting Out</div>
+              <div class="track"><div class="track-fill" id="home-level-fill" style="width:0%"></div></div>
+              <div class="level-next" id="home-level-next">Next: Building Base</div>
+            </div>
+            <div class="level-pct" id="home-level-pct">0%</div>
+          </div>
+
+          <div class="score-card">
+            <svg class="score-ring" viewBox="0 0 60 60" aria-hidden="true">
+              <circle class="score-ring-track" cx="30" cy="30" r="26"/>
+              <circle class="score-ring-fill" id="home-score-ring" cx="30" cy="30" r="26"
+                      stroke-dasharray="163.36" stroke-dashoffset="163.36"/>
+              <text class="score-ring-num" id="home-score-num"
+                    x="50%" y="50%" dominant-baseline="central" text-anchor="middle">0</text>
+            </svg>
+            <div class="score-body">
+              <div class="score-heading">Financial Health Score</div>
+              <div class="score-desc" id="home-score-desc">Add accounts and goals to improve your score.</div>
+            </div>
+          </div>
+
+        </div><!-- /home-col-left -->
+
+        <!-- Right col: top goals -->
+        <div class="home-col-right">
+          <div class="home-goals-bar">
+            <span class="section-inner-label">Priority Goals</span>
+            <button class="btn-ghost-sm" onclick="navigate('goals')">View all →</button>
+          </div>
+          <div class="card-stack" id="home-goals"></div>
+        </div><!-- /home-col-right -->
+
+      </div><!-- /home-grid -->
+    </div><!-- /screen-home -->
+
+    <!-- ══════════════════════════════════════════
+         SCREEN: ACCOUNTS
+    ══════════════════════════════════════════ -->
+    <div id="screen-accounts" class="screen">
+
+      <div class="page-header">
+        <div>
+          <div class="page-title">Accounts</div>
+          <div class="page-subtitle">Track your assets and liabilities</div>
+        </div>
+      </div>
+
+      <!-- Summary pills -->
+      <div class="acc-summary-row">
+        <div class="acc-summary-chip">
+          <div class="asc-label">Total Assets</div>
+          <div class="asc-val pos" id="acc-total-val">$0</div>
+        </div>
+        <div class="acc-summary-chip">
+          <div class="asc-label">Total Debt</div>
+          <div class="asc-val neg" id="debt-total-val2">$0</div>
+        </div>
+        <div class="acc-summary-chip">
+          <div class="asc-label">Net Worth</div>
+          <div class="asc-val acc" id="acc-nw-val">$0</div>
+        </div>
+      </div>
+
+      <!-- Desktop two-column layout -->
+      <div class="accounts-grid">
+
+        <div class="accounts-col">
+          <div class="col-header">
+            <span class="col-label">Savings &amp; Investments</span>
+          </div>
+          <div class="account-list" id="standard-list"></div>
+
+          <div id="custom-section" class="hidden">
+            <div class="col-header" style="margin-top:16px">
+              <span class="col-label">Custom Accounts</span>
+              <button class="btn-ghost-sm" onclick="openAddCustom()">+ Add</button>
+            </div>
+            <div class="account-list" id="custom-list"></div>
+          </div>
+
+          <div id="custom-add-row">
+            <button class="add-row" onclick="openAddCustom()">+ Add custom account</button>
+          </div>
+        </div>
+
+        <div class="debts-col">
+          <div class="col-header">
+            <span class="col-label">Debts &amp; Liabilities</span>
+            <button class="btn-ghost-sm" onclick="openAddDebt()">+ Add</button>
+          </div>
+          <div class="account-list" id="debt-list"></div>
+        </div>
+
+      </div><!-- /accounts-grid -->
+    </div><!-- /screen-accounts -->
+
+    <!-- ══════════════════════════════════════════
+         SCREEN: GOALS
+    ══════════════════════════════════════════ -->
+    <div id="screen-goals" class="screen">
+
+      <div class="page-header goals-page-header">
+        <div>
+          <div class="page-title">Goals</div>
+          <div class="page-subtitle">Net available: <span id="goals-nw-val" class="text-accent fw-7">—</span></div>
+        </div>
+        <button class="btn-primary-sm" onclick="openAddGoal()">+ Add Goal</button>
+      </div>
+
+      <!-- Allocation visualizer -->
+      <div class="alloc-section">
+        <div class="alloc-label">Fund Allocation — Priority Order</div>
+        <div class="alloc-bar" id="alloc-bar"></div>
+        <div class="alloc-legend" id="alloc-legend"></div>
+      </div>
+
+      <!-- Goal cards grid -->
+      <div class="goals-grid" id="goals-list"></div>
+
+    </div><!-- /screen-goals -->
+
+    <!-- ══════════════════════════════════════════
+         SCREEN: SETTINGS
+    ══════════════════════════════════════════ -->
+    <div id="screen-settings" class="screen">
+      <div class="page-header">
+        <div class="page-title">Settings</div>
+      </div>
+
+      <div class="settings-grid">
+
+        <div class="settings-section">
+          <div class="settings-label">Your Profile</div>
+          <div class="settings-form">
+            <div class="field">
+              <label class="field-label" for="settings-name">Display Name</label>
+              <input id="settings-name" class="input" type="text" placeholder="Your name" />
+            </div>
+            <div class="field">
+              <label class="field-label">Avatar</label>
+              <div class="avatar-row">
+                <div class="avatar-opt selected" data-emoji="💎" onclick="selectAvatar('💎')">💎</div>
+                <div class="avatar-opt" data-emoji="🦊" onclick="selectAvatar('🦊')">🦊</div>
+                <div class="avatar-opt" data-emoji="🐻" onclick="selectAvatar('🐻')">🐻</div>
+                <div class="avatar-opt" data-emoji="🦁" onclick="selectAvatar('🦁')">🦁</div>
+                <div class="avatar-opt" data-emoji="🐙" onclick="selectAvatar('🐙')">🐙</div>
+                <div class="avatar-opt" data-emoji="🌙" onclick="selectAvatar('🌙')">🌙</div>
+                <div class="avatar-opt" data-emoji="⚡" onclick="selectAvatar('⚡')">⚡</div>
+                <div class="avatar-opt" data-emoji="🔥" onclick="selectAvatar('🔥')">🔥</div>
+              </div>
+            </div>
+            <button id="settings-save-btn" class="btn btn-primary" onclick="saveSettings()">Save Changes</button>
+          </div>
+        </div>
+
+        <div class="settings-section">
+          <div class="settings-label">About Pape</div>
+          <p class="settings-body">All data is stored locally in your browser via <code>localStorage</code> — nothing leaves your device. Supports TFSA, FHSA, Investments, Savings, Cash, and unlimited custom accounts.</p>
+        </div>
+
+        <div class="settings-section">
+          <div class="settings-label">Wealth Level Guide</div>
+          <div class="level-guide">
+            <div class="lg-row"><span>🌱</span><span>Level 0 — Starting Out</span><span class="text-muted">&lt; $0</span></div>
+            <div class="lg-row"><span>🔨</span><span>Level 1 — Building Base</span><span class="text-muted">$0–$10K</span></div>
+            <div class="lg-row"><span>🚀</span><span>Level 2 — Gaining Momentum</span><span class="text-muted">$10K–$50K</span></div>
+            <div class="lg-row"><span>📈</span><span>Level 3 — Growing Wealth</span><span class="text-muted">$50K–$150K</span></div>
+            <div class="lg-row"><span>💼</span><span>Level 4 — Wealth Builder</span><span class="text-muted">$150K–$500K</span></div>
+            <div class="lg-row"><span>🏔️</span><span>Level 5 — Financial Freedom</span><span class="text-muted">$500K+</span></div>
+          </div>
+        </div>
+
+        <div class="settings-section">
+          <div class="settings-label">Data</div>
+          <p class="settings-body" style="margin-bottom:16px">Permanently erase all accounts, debts, and goals. This cannot be undone.</p>
+          <button class="btn btn-danger" onclick="resetData()">⚠️ Reset All Data</button>
+        </div>
+
+      </div>
+    </div><!-- /screen-settings -->
+
+    <!-- ─── BOTTOM NAV (mobile only) ───────────────────── -->
+    <nav class="bottom-nav" role="navigation">
+      <button class="nav-tab active" data-screen="home">
+        <span class="nav-icon">🏠</span><span class="nav-label">Home</span>
+      </button>
+      <button class="nav-tab" data-screen="accounts">
+        <span class="nav-icon">💳</span><span class="nav-label">Accounts</span>
+      </button>
+      <button class="nav-tab" data-screen="goals">
+        <span class="nav-icon">🎯</span><span class="nav-label">Goals</span>
+      </button>
+      <button class="nav-tab" data-screen="settings">
+        <span class="nav-icon">⚙️</span><span class="nav-label">Settings</span>
+      </button>
+    </nav>
+
+    <!-- FABs (mobile only, shown/hidden via JS) -->
+    <button class="fab" id="fab-accounts" style="display:none" onclick="openAddCustom()">+</button>
+    <button class="fab" id="fab-goals"    style="display:none" onclick="openAddGoal()">+</button>
+
+  </div><!-- /content-wrap -->
+</div><!-- /app-shell -->
+
+<!-- ════════════════════════════════════════════════════════
+     MODALS
+════════════════════════════════════════════════════════ -->
+<div id="modal-overlay" class="modal-overlay hidden">
+
+  <div id="modal-account" class="modal hidden">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="acc-modal-title">Edit Account</div>
+    <div class="modal-form">
+      <div class="field">
+        <label class="field-label" id="acc-modal-label">Balance</label>
+        <div class="input-wrap"><span class="input-pre">$</span>
+          <input id="acc-modal-amount" class="input" type="number" min="0" step="1" placeholder="0" />
+        </div>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-primary" onclick="saveAccountEdit()">Save</button>
+      <button class="btn btn-danger hidden" id="acc-modal-del" onclick="deleteCustomAccount()">Remove Account</button>
+      <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+    </div>
+  </div>
+
+  <div id="modal-custom" class="modal hidden">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Add Custom Account</div>
+    <div class="modal-form">
+      <div class="field">
+        <label class="field-label" for="custom-name">Account Name</label>
+        <input id="custom-name" class="input" type="text" placeholder="e.g. GIC, Crypto, RESP…" />
+      </div>
+      <div class="field">
+        <label class="field-label" for="custom-amount">Current Balance</label>
+        <div class="input-wrap"><span class="input-pre">$</span>
+          <input id="custom-amount" class="input" type="number" min="0" step="1" placeholder="0" />
+        </div>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-primary" onclick="saveCustomAccount()">Add Account</button>
+      <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+    </div>
+  </div>
+
+  <div id="modal-debt" class="modal hidden">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="debt-modal-title">Add Debt</div>
+    <div class="modal-form">
+      <div class="field">
+        <label class="field-label" for="debt-name">Debt Name</label>
+        <input id="debt-name" class="input" type="text" placeholder="e.g. Credit Card, Student Loan…" />
+      </div>
+      <div class="field">
+        <label class="field-label" for="debt-amount">Amount Owed</label>
+        <div class="input-wrap"><span class="input-pre">$</span>
+          <input id="debt-amount" class="input" type="number" min="0" step="1" placeholder="0" />
+        </div>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-primary" onclick="saveDebt()">Save</button>
+      <button class="btn btn-danger hidden" id="debt-modal-del" onclick="deleteDebt()">Remove Debt</button>
+      <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+    </div>
+  </div>
+
+  <div id="modal-goal" class="modal hidden">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="goal-modal-title">Add Goal</div>
+    <div class="modal-form">
+      <div class="field">
+        <label class="field-label" for="goal-name">Goal Name</label>
+        <input id="goal-name" class="input" type="text" placeholder="e.g. Emergency Fund, New Car…" />
+      </div>
+      <div class="field">
+        <label class="field-label" for="goal-category">Category</label>
+        <select id="goal-category" class="input"></select>
+      </div>
+      <div class="field">
+        <label class="field-label" for="goal-target">Target Amount</label>
+        <div class="input-wrap"><span class="input-pre">$</span>
+          <input id="goal-target" class="input" type="number" min="0" step="100" placeholder="10,000" />
+        </div>
+      </div>
+      <div class="field">
+        <label class="field-label" for="goal-current">Already Saved Toward This Goal</label>
+        <div class="input-wrap"><span class="input-pre">$</span>
+          <input id="goal-current" class="input" type="number" min="0" step="100" placeholder="0" />
+        </div>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-primary" onclick="saveGoal()">Save Goal</button>
+      <button class="btn btn-danger hidden" id="goal-modal-del" onclick="deleteGoal()">Delete Goal</button>
+      <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+    </div>
+  </div>
+
+</div><!-- /modal-overlay -->
+
+<script src="app.js"></script>
+<script>
+  /* FAB visibility per screen × viewport */
+  function syncFabs(screen) {
+    const mobile = window.innerWidth < 1024;
+    document.getElementById('fab-accounts').style.display = (screen === 'accounts' && mobile) ? 'flex' : 'none';
+    document.getElementById('fab-goals').style.display    = (screen === 'goals'    && mobile) ? 'flex' : 'none';
+  }
+  document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.nav-tab, .sidebar-tab').forEach(t =>
+      t.addEventListener('click', () => syncFabs(t.dataset.screen))
+    );
+    window.addEventListener('resize', () => syncFabs(window._vaultScreen || 'home'));
+  });
+</script>
+</body>
+</html>
